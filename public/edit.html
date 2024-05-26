@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit User</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+    <h1>Edit User</h1>
+    <form id="edit-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="nickname">Nickname:</label>
+        <input type="text" id="nickname" name="nickname" required>
+        <br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+        <br>
+        <label for="bio">Bio:</label>
+        <textarea id="bio" name="bio" required></textarea>
+        <br>
+        <button type="submit">Save</button>
+    </form>
+    <div id="go_user"><a href="/">Go to Users</a></div>
+    
+
+    <script>
+        const userId = window.location.pathname.split('/').pop();
+
+        fetch(`/api/users/${userId}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('name').value = user.name;
+                document.getElementById('nickname').value = user.nickname;
+                document.getElementById('age').value = user.age;
+                document.getElementById('bio').value = user.bio;
+            });
+
+        document.getElementById('edit-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const nickname = document.getElementById('nickname').value;
+            const age = document.getElementById('age').value;
+            const bio = document.getElementById('bio').value;
+
+            fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, nickname, age, bio })
+            }).then(() => {
+                window.location.href = '/';
+            });
+        });
+    </script>
+</body>
+</html>
