@@ -4,23 +4,19 @@ const logic = require('./logic');
 const path = require('path');
 
 const app = express();
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public')); 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'public')); 
 
-
-
+// Routes
 app.get('/', logic.getAllUsers);
+app.get('/users', logic.getAllUsers);
 app.get('/user/:id', logic.getUserById);
 app.get('/edit/:id', logic.editUserForm);
 app.post('/update/:id', logic.updateUser);
 app.post('/delete/:id', logic.deleteUser);
 app.get('/create', logic.createUserForm);
 app.post('/create', logic.createUser);
-
 
 
 
