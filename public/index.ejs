@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Users</title>
+  <link rel="stylesheet" href="/styles/style.css">
+  <script defer src="/main.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>All Users</h1>
+    <a href="/create">Create New User</a>
+    <ul id="userList">
+      <% users.forEach(user => { %>
+        <li>
+          <a href="/user/<%= user.id %>"><%= user.name %> (<%= user.nickname %>)</a>
+          <button data-id="<%= user.id %>" class="deleteBtn">Delete</button>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+</body>
+</html>
