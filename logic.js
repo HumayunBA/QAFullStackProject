@@ -1,9 +1,10 @@
 const database = require('./database');
 const path = require('path');
+const fs = require('fs');
 
 // Function to get all users
 const getAllUsers = (req, res) => {
-  database.query('SELECT * FROM Users', (err, results) => {
+  database.query('SELECT * FROM usersdb', (err, results) => {
     if (err) {
       console.error('Error fetching users:', err);
       res.status(500).send('Failed to fetch users');
@@ -16,7 +17,7 @@ const getAllUsers = (req, res) => {
 // Function to get a user by ID
 const getUserById = (req, res) => {
   const userId = req.params.id;
-  database.query('SELECT * FROM Users WHERE id = ?', [userId], (err, results) => {
+  database.query('SELECT * FROM usersdb WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error fetching user by ID:', err);
       res.status(500).send('Failed to fetch user');
@@ -28,15 +29,20 @@ const getUserById = (req, res) => {
   });
 };
 
+
+
 // Function to render the create user form
 const createUserForm = (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'create.html'));
+  const createHtmlPath = path.join(__dirname, 'public', 'create.html');
+  const createHtmlContent = fs.readFileSync(createHtmlPath, 'utf-8');
+  res.status(200).send(createHtmlContent);
 };
+
 
 // Function to create a new user
 const createUser = (req, res) => {
   const { name, nickname, age, bio } = req.body;
-  database.query('INSERT INTO Users (name, nickname, age, bio) VALUES (?, ?, ?, ?)', [name, nickname, age, bio], (err, results) => {
+  database.query('INSERT INTO usersdb (name, nickname, age, bio) VALUES (?, ?, ?, ?)', [name, nickname, age, bio], (err, results) => {
     if (err) {
       console.error('Error creating user:', err);
       res.status(500).send('Failed to create user');
@@ -49,7 +55,7 @@ const createUser = (req, res) => {
 // Function to render the edit user form
 const editUserForm = (req, res) => {
   const userId = req.params.id;
-  database.query('SELECT * FROM Users WHERE id = ?', [userId], (err, results) => {
+  database.query('SELECT * FROM usersdb WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error fetching user for editing:', err);
       res.status(500).send('Failed to fetch user for editing');
@@ -65,7 +71,7 @@ const editUserForm = (req, res) => {
 const updateUser = (req, res) => {
   const userId = req.params.id;
   const { name, nickname, age, bio } = req.body;
-  database.query('UPDATE Users SET name = ?, nickname = ?, age = ?, bio = ? WHERE id = ?', [name, nickname, age, bio, userId], (err, results) => {
+  database.query('UPDATE usersdb SET name = ?, nickname = ?, age = ?, bio = ? WHERE id = ?', [name, nickname, age, bio, userId], (err, results) => {
     if (err) {
       console.error('Error updating user:', err);
       res.status(500).send('Failed to update user');
@@ -78,13 +84,13 @@ const updateUser = (req, res) => {
 // Function to delete a user
 const deleteUser = (req, res) => {
   const userId = req.params.id;
-  database.query('DELETE FROM Users WHERE id = ?', [userId], (err, results) => {
+  database.query('DELETE FROM usersdb WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error deleting user:', err);
       res.status(500).send('Failed to delete user');
     } else {
       res.sendStatus(200);
-  });
+  }});
 };
 
 module.exports = {
