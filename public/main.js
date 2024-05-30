@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  
   if (document.getElementById('userList')) {
     try {
       const response = await fetch('/users');
@@ -11,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       userList.innerHTML = ''; 
       userData.forEach(user => {
         const listItem = document.createElement('li');
+        listItem.id = `user-${user.id}`; // Add unique ID for each user
 
         const userLink = document.createElement('a');
         userLink.textContent = `${user.name} (${user.nickname})`;

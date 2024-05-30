@@ -1,47 +1,52 @@
-const { Builder, By, Key, until } = require('selenium-webdriver');
+const { Builder, By } = require('selenium-webdriver');
+
+// Increase timeout for this test file
+jest.setTimeout(90000); // Set timeout to 90 seconds
 
 async function createUserTest() {
-  // Create a new WebDriver instance
   let driver = await new Builder().forBrowser('firefox').build();
 
   try {
-    // Step 1: Navigate to the Create User Page
+    // Navigate to the application
     await driver.get('http://localhost:3000');
+    
+    // Click on create user button
     await driver.findElement(By.id('create-user')).click();
 
-    // Step 2: Fill out the Form
+    // Fill out the user creation form
     await driver.findElement(By.id('name')).sendKeys('John Doe');
     await driver.findElement(By.id('nickname')).sendKeys('johnd');
     await driver.findElement(By.id('age')).sendKeys('30');
     await driver.findElement(By.id('bio')).sendKeys('A bio');
-
-    // Step 3: Submit the Form
+    
+    // Submit the form
     await driver.findElement(By.id('submit')).click();
 
-    // Step 4: Verify User Creation
+    // Wait for redirection and user list to be updated
     await driver.get('http://localhost:3000');
-    let userElements = await driver.findElements(By.className('user'));
-    let newUserFound = false;
-    for (let userElement of userElements) {
-      let userText = await userElement.getText();
-      if (userText.includes('John Doe') && userText.includes('johnd') && userText.includes('30') && userText.includes('A bio')) {
-        newUserFound = true;
-        break;
-      }
-    }
-    if (newUserFound) {
-      console.log('User creation test passed!');
-    } else {
-      console.error('User creation test failed!');
-    }
+    
+    // Wait for the user list to be populated
+    await driver.sleep(2000); // Adjust sleep time if necessary
 
+    // Find the newly created user by its ID
+    let newUserElement = await driver.findElement(By.id('user-1')); // Assuming '1' is the ID of the newly created user
+    let newUserText = await newUserElement.getText();
+
+    // Verify the new user details
+    let newUserFound = newUserText.includes('John Doe') &&
+                       newUserText.includes('johnd') &&
+                       newUserText.includes('30') &&
+                       newUserText.includes('A bio');
+
+    return newUserFound;
   } catch (error) {
     console.error('An error occurred:', error);
+    throw error;
   } finally {
-    // Quit the WebDriver session
     await driver.quit();
   }
 }
 
-// Run the test
-createUserTest();
+test('User creation test', async () => {
+  expect(await createUserTest()).toBe(true);
+});
