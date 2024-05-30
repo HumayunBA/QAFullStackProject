@@ -1,95 +1,60 @@
-const chai = require('chai');
-const expect = chai.expect;
-const sinon = require('sinon');
-const logic = require('../../logic');
-const database = require('../../database');
-const httpMocks = require('node-mocks-http');
+const { expect } = require('chai');
+const logic = require('../../logic1');
+const originalMockDatabase = require('../../mockDatabase.json'); 
+
+let mockDatabase;
+
+beforeEach(() => {
+  mockDatabase = JSON.parse(JSON.stringify(originalMockDatabase));
+  logic.setMockData(mockDatabase); 
+});
 
 describe('Logic Functions', () => {
-  afterEach(() => {
-    sinon.restore(); // Restore mocked functions after each test
+  it('getAllUsers should return all users', () => {
+    const users = logic.getAllUsers();
+
+    expect(users).to.deep.equal(mockDatabase.users);
   });
 
-  it('should return all users when getAllUsers is called', () => {
-    const mockUsers = [{ id: 1, name: 'John Doe' }, { id: 2, name: 'Jane Doe' }];
-    const req = httpMocks.createRequest();
-    const res = httpMocks.createResponse();
+  it('getUserByName should return a user by name if user exists', () => {
+    const userName = 'John Doe';
+    const user = mockDatabase.users.find(u => u.name === userName);
 
-    // Mock database query function
-    const queryStub = sinon.stub(database, 'query').callsFake((query, callback) => {
-      callback(null, mockUsers);
-    });
+    const result = logic.getUserByName(userName);
 
-    // Test the logic function
-    logic.getAllUsers(req, res);
-
-    expect(res.statusCode).to.equal(200);
-    expect(res._getJSONData()).to.deep.equal(mockUsers);
-    queryStub.restore(); // Restore the stub after the test
+    expect(result).to.deep.equal(user);
   });
 
-  it('should return a user by ID if user exists when getUserById is called', () => {
-    const mockUser = { id: 1, name: 'John Doe' };
-    const req = httpMocks.createRequest({ params: { id: 1 } });
-    const res = httpMocks.createResponse();
+  it('getUserByName should return null if user does not exist', () => {
+    const userName = 'Nonexistent User';
 
-    // Mock database query function
-    const queryStub = sinon.stub(database, 'query').callsFake((query, values, callback) => {
-      callback(null, [mockUser]);
-    });
+    const result = logic.getUserByName(userName);
 
-    // Test the logic function
-    logic.getUserById(req, res);
-
-    expect(res.statusCode).to.equal(200);
-    expect(res._getJSONData()).to.deep.equal(mockUser);
-    queryStub.restore(); // Restore the stub after the test
+    expect(result).to.be.null;
   });
 
-  it('should return 404 if user does not exist when getUserById is called', () => {
-    const req = httpMocks.createRequest({ params: { id: 1 } });
-    const res = httpMocks.createResponse();
+  it('createUser should add a new user', () => {
+    const newUser = { name: 'Alice Doe', nickname: 'aliced', age: 25, bio: 'Lorem ipsum...' };
+    const createdUser = logic.createUser(newUser);
+    const users = logic.getAllUsers();
 
-    // Mock database query function
-    const queryStub = sinon.stub(database, 'query').callsFake((query, values, callback) => {
-      callback(null, []);
-    });
-
-    // Test the logic function
-    logic.getUserById(req, res);
-
-    expect(res.statusCode).to.equal(404);
-    queryStub.restore(); // Restore the stub after the test
+    expect(users).to.deep.include(createdUser);
   });
 
-  it('should render the create user form when createUserForm is called', () => {
-    const req = httpMocks.createRequest();
-    const res = httpMocks.createResponse();
-
-    // Test the logic function
-    logic.createUserForm(req, res);
-
-    expect(res.statusCode).to.equal(200);
-    expect(res._getData()).to.contain('<h1>Create User</h1>');
-    expect(res._getData()).to.contain('<form id="createUserForm">');
-    expect(res._getData()).to.contain('<button type="submit">Create</button>');
+  it('updateUserByName should update an existing user', () => {
+    const userName = 'John Doe';
+    const updatedInfo = { age: 35 };
+    logic.updateUserByName(userName, updatedInfo);
+    const updatedUser = logic.getUserByName(userName);
+    expect(updatedUser.age).to.equal(updatedInfo.age);
   });
 
-  it('should create a new user when createUser is called', () => {
-    const req = httpMocks.createRequest({
-      body: { name: 'John Doe', nickname: 'johnd', age: 30, bio: 'A bio' }
-    });
-    const res = httpMocks.createResponse();
-
-    // Mock database query function
-    const queryStub = sinon.stub(database, 'query').callsFake((query, values, callback) => {
-      callback(null, { insertId: 1 });
-    });
-
-    // Test the logic function
-    logic.createUser(req, res);
-
-    expect(res.statusCode).to.equal(302); // Redirect status
-    queryStub.restore(); // Restore the stub after the test
+  it('deleteUserByName should delete an existing user', () => {
+    const userName = 'John Doe';
+    const deletedUser = logic.deleteUserByName(userName);
+    const users = logic.getAllUsers();
+    expect(deletedUser).to.exist;
+    expect(users.find(u => u.name === userName)).to.not.exist;
   });
+
 });

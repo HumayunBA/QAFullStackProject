@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // Function to get all users
 const getAllUsers = (req, res) => {
-  database.query('SELECT * FROM usersdb', (err, results) => {
+  database.query('SELECT * FROM users', (err, results) => {
     if (err) {
       console.error('Error fetching users:', err);
       res.status(500).send('Failed to fetch users');
@@ -17,7 +17,7 @@ const getAllUsers = (req, res) => {
 // Function to get a user by ID
 const getUserById = (req, res) => {
   const userId = req.params.id;
-  database.query('SELECT * FROM usersdb WHERE id = ?', [userId], (err, results) => {
+  database.query('SELECT * FROM users WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error fetching user by ID:', err);
       res.status(500).send('Failed to fetch user');
@@ -42,7 +42,7 @@ const createUserForm = (req, res) => {
 // Function to create a new user
 const createUser = (req, res) => {
   const { name, nickname, age, bio } = req.body;
-  database.query('INSERT INTO usersdb (name, nickname, age, bio) VALUES (?, ?, ?, ?)', [name, nickname, age, bio], (err, results) => {
+  database.query('INSERT INTO users (name, nickname, age, bio) VALUES (?, ?, ?, ?)', [name, nickname, age, bio], (err, results) => {
     if (err) {
       console.error('Error creating user:', err);
       res.status(500).send('Failed to create user');
@@ -55,7 +55,7 @@ const createUser = (req, res) => {
 // Function to render the edit user form
 const editUserForm = (req, res) => {
   const userId = req.params.id;
-  database.query('SELECT * FROM usersdb WHERE id = ?', [userId], (err, results) => {
+  database.query('SELECT * FROM users WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error fetching user for editing:', err);
       res.status(500).send('Failed to fetch user for editing');
@@ -71,7 +71,7 @@ const editUserForm = (req, res) => {
 const updateUser = (req, res) => {
   const userId = req.params.id;
   const { name, nickname, age, bio } = req.body;
-  database.query('UPDATE usersdb SET name = ?, nickname = ?, age = ?, bio = ? WHERE id = ?', [name, nickname, age, bio, userId], (err, results) => {
+  database.query('UPDATE users SET name = ?, nickname = ?, age = ?, bio = ? WHERE id = ?', [name, nickname, age, bio, userId], (err, results) => {
     if (err) {
       console.error('Error updating user:', err);
       res.status(500).send('Failed to update user');
@@ -84,7 +84,7 @@ const updateUser = (req, res) => {
 // Function to delete a user
 const deleteUser = (req, res) => {
   const userId = req.params.id;
-  database.query('DELETE FROM usersdb WHERE id = ?', [userId], (err, results) => {
+  database.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error deleting user:', err);
       res.status(500).send('Failed to delete user');
