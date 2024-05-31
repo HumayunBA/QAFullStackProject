@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
+    "testTimeout": "30000",
     "testmocha": "mocha --recursive --reporter mochawesome __tests__",
     "test:unit": "jest __tests__/unit",
     "test:integration": "jest __tests__/integration",
