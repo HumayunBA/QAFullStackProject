@@ -1,6 +1,7 @@
 # QAFullstackProject
 
 This is a QA project which tests a fullstack application built on Nodejs Express and Mysql Workbench for a user management system. The project tests unit functions, integration tests, and then end to end system testing. For testing supertest, jest, chai, and mocha and mochawsome is used. Please following instruction after cloning or downloading the repository.
+
 ## Instructions to run:
 Install the following depencies on nodejs express server:
 body-parser": "^1.19.0",
